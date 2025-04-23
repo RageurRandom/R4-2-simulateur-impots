@@ -42,48 +42,61 @@ public class Simulateur {
 
     private double[] taux = new double[5];
 
-    private  int lAbtMax = 14171;
-    private  int lAbtMin = 495;
-    private double tAbt = 0.1;
+    private static final int ABATTEMENT_MAX = 14171;
+    private static final int ABATTEMENT_MIN = 495;
+    private static final double TAUX_ABATTEMENT = 0.1;
 
-    private double plafDemiPart = 1759;
+    private static final double PLAFOND_DEMI_PART = 1759;
 
-    private double seuilDecoteDeclarantSeul = 1929;
-    private double seuilDecoteDeclarantCouple    = 3191;
+    private static final double SEUIL_DECOTE_DECLARANT_SEUL = 1929;
+    private static final double SEUIL_DECOTE_DECLARANT_COUPLE = 3191;
 
-    private double decoteMaxDeclarantSeul = 873;
-    private double decoteMaxDeclarantCouple = 1444;
-    private double tauxDecote = 0.4525;
+    private static final double DECOTE_MAX_DECLARANT_SEUL = 873;
+    private static final double DECOTE_MAX_DECLARANT_COUPLE = 1444;
+    private static final double TAUX_DECOTE = 0.4525;
 
-    private int rNet = 0;
+    private int revenusNet = 0;
     private int nbEnf = 0;
-    private int nbEnfH = 0;
+    private int nbEnfHandicapes = 0;
 
     private double rFRef = 0;
-    private double rImposable = 0;
+    private double resteImposable = 0;
 
-    private double abt = 0;
-
-    private double nbPtsDecl = 0;
-    private double nbPts = 0;
+    private double nbPartsDecl = 0;
+    private double nbParts = 0;
     private double decote = 0;
 
-    private double mImpDecl = 0;
-    private double mImp = 0;
+    private double montantImpDecl = 0;
+    private double montantImpots = 0;
 
-    private boolean parIso = false;
 
+    private static final int CINQ = 5; //TODO trouver à quoi cette constante correspond
 
     // Fonction de calcul de l'impôt sur le revenu net en France en 2024 sur les revenu 2023
 
-    public long calculImpot( int revNet, SituationFamiliale sitFam, int nbEnfants, int nbEnfantsHandicapes, boolean parentIsol) {
 
-        rNet = revNet;
+    /**
+     * Fonction calculant et renvoyant l'abattement
+     * @return abattement double
+     */
+    private double getAbattement(){
+        double abattement = revenusNet * TAUX_ABATTEMENT;
+
+        abattement = Math.max(abattement, ABATTEMENT_MAX);
+        abattement = Math.min(abattement, ABATTEMENT_MIN);
+
+        return abattement;
+    }
+
+
+    public long calculImpot( int revNet, SituationFamiliale sitFam, int nbEnfants, int nbEnfantsHandicapes, boolean parentIsol) {
+        //TODO parentIso =/= parentIsol
+        revenusNet = revNet;
 
         nbEnf = nbEnfants;
-        nbEnfH = nbEnfantsHandicapes;
-        parIso = parentIsol;
+        nbEnfHandicapes = nbEnfantsHandicapes;
 
+        //TODO on doit pouvoir faire mieux
         limites[0] = l00;
         limites[1] = l01;
         limites[2] = l02;
@@ -99,126 +112,105 @@ public class Simulateur {
 
         // Abattement
 
-        abt = rNet * tAbt;
-
-        if (abt > lAbtMax) {
-            abt = lAbtMax;
-        }
-
-        if (abt < lAbtMin) {
-            abt = lAbtMin;
-        }
-
-
-        rFRef = rNet - abt;
+        double abattement = getAbattement();
+        rFRef = revenusNet - abattement;
 
         // parts déclarants
-        switch ( sitFam ) {
-            case CELIBATAIRE:
-                nbPtsDecl = 1;
-                break;
-            case MARIE:
-                nbPtsDecl = 2;
-                break;
-            case DIVORCE:
-                nbPtsDecl = 1;
-                break;
-            case VEUF:
-                if ( nbEnf == 0 ) {
-                    nbPtsDecl = 1;
-                } else {
-                    nbPtsDecl = 2;
-                }
-                nbPtsDecl = 1;
-                break;
+
+        nbPartsDecl = sitFam.nbParts;
+
+        //on garde la part du conjoint décédé si on a des enfants à charge
+        if(sitFam == SituationFamiliale.VEUF && nbEnf > 0){
+
+            nbPartsDecl = 2;
         }
 
         // parts enfants à charge
         if ( nbEnf <= 2 ) {
-            nbPts = nbPtsDecl + nbEnf * 0.5;
-        } else if ( nbEnf > 2 ) {
-            nbPts = nbPtsDecl+  1.0 + ( nbEnf - 2 );
+            nbParts = nbPartsDecl + nbEnf * 0.5;
+        } else {
+            nbParts = nbPartsDecl +  1.0 + ( nbEnf - 2 );
         }
 
         // parent isolé
-        if ( parIso ) {
-            if ( nbEnf > 0 ){
-                nbPts = nbPts + 0.5;
-            }
+        if (parentIsol && nbEnf > 0) {
+            nbParts = nbParts + 0.5;
         }
 
         // enfant handicapé
-        nbPts = nbPts + nbEnfH * 0.5;
+        nbParts = nbParts + nbEnfHandicapes * 0.5;
 
         // impôt des declarants
-        rImposable = rFRef / nbPtsDecl ;
+        resteImposable = rFRef / nbPartsDecl;
 
-        mImpDecl = 0;
+        montantImpDecl = 0;
 
+        //TODO A changer en fonction
         int i = 0;
         do {
-            if ( rImposable >= limites[i] && rImposable < limites[i+1] ) {
-                mImpDecl += ( rImposable - limites[i] ) * taux[i];
+            if ( resteImposable >= limites[i] && resteImposable < limites[i+1] ) {
+                montantImpDecl += ( resteImposable - limites[i] ) * taux[i];
                 break;
             } else {
-                mImpDecl += ( limites[i+1] - limites[i] ) * taux[i];
+                montantImpDecl += ( limites[i+1] - limites[i] ) * taux[i];
             }
             i++;
-        } while( i < 5);
+        } while( i < CINQ);
 
-        mImpDecl = mImpDecl * nbPtsDecl;
-        mImpDecl = Math.round( mImpDecl );
+        montantImpDecl = montantImpDecl * nbPartsDecl;
+        montantImpDecl = Math.round(montantImpDecl);
 
         // impôt foyer fiscal complet
-        rImposable =  rFRef / nbPts;
-        mImp = 0;
+        resteImposable =  rFRef / nbParts;
+        montantImpots = 0;
+
+        //TODO A changer en fonction
         i = 0;
 
         do {
-            if ( rImposable >= limites[i] && rImposable < limites[i+1] ) {
-                mImp += ( rImposable - limites[i] ) * taux[i];
+            if ( resteImposable >= limites[i] && resteImposable < limites[i+1] ) {
+                montantImpots += ( resteImposable - limites[i] ) * taux[i];
                 break;
             } else {
-                mImp += ( limites[i+1] - limites[i] ) * taux[i];
+                montantImpots += ( limites[i+1] - limites[i] ) * taux[i];
             }
             i++;
-        } while( i < 5);
+        } while( i < CINQ);
 
-        mImp = mImp * nbPts;
-        mImp = Math.round( mImp );
+        montantImpots = montantImpots * nbParts;
+        montantImpots = Math.round(montantImpots);
 
         // baisse impot
-        double baisseImpot = mImpDecl - mImp;
+        double baisseImpot = montantImpDecl - montantImpots;
 
         // dépassement plafond
-        double ecartPts = nbPts - nbPtsDecl;
+        double ecartParts = nbParts - nbPartsDecl;
 
-        double plafond = (ecartPts / 0.5) * plafDemiPart;
+        double plafond = ecartParts * PLAFOND_DEMI_PART * 2;
 
         if ( baisseImpot >= plafond ) {
-            mImp = mImpDecl - plafond;
+            montantImpots = montantImpDecl - plafond;
         }
 
         decote = 0;
         // decote
-        if ( nbPtsDecl == 1 ) {
-            if ( mImp < seuilDecoteDeclarantSeul ) {
-                 decote = decoteMaxDeclarantSeul - ( mImp  * tauxDecote );
+        if ( nbPartsDecl == 1 ) {
+            if ( montantImpots < SEUIL_DECOTE_DECLARANT_SEUL) {
+                 decote = DECOTE_MAX_DECLARANT_SEUL - ( montantImpots * TAUX_DECOTE);
             }
         }
-        if (  nbPtsDecl == 2 ) {
-            if ( mImp < seuilDecoteDeclarantCouple ) {
-                 decote =  decoteMaxDeclarantCouple - ( mImp  * tauxDecote  );
+        if (  nbPartsDecl == 2 ) {
+            if ( montantImpots < SEUIL_DECOTE_DECLARANT_COUPLE) {
+                 decote =  DECOTE_MAX_DECLARANT_COUPLE - ( montantImpots * TAUX_DECOTE);
             }
         }
+
         decote = Math.round( decote );
-        if ( mImp <= decote ) {
-            decote = mImp;
-        }
 
-        mImp = mImp - decote;
 
-        return Math.round( mImp );
+        montantImpots = Math.max(0, montantImpots - decote);
+
+        return Math.round(montantImpots);
     }
 
     public static void main(String[] args) {
