@@ -88,6 +88,31 @@ public class Simulateur {
         return abattement;
     }
 
+    /**
+     * Fonction calculant et renvoyant la décote
+     * @param nbPartsDecl
+     * @param montantImpots
+     * @return decote double
+     */
+    private double getDecote(double nbPartsDecl, double montantImpots){
+        double decote = 0;
+
+        if ( nbPartsDecl == 1 ) {
+            if ( montantImpots < SEUIL_DECOTE_DECLARANT_SEUL) {
+                decote = DECOTE_MAX_DECLARANT_SEUL - ( montantImpots * TAUX_DECOTE);
+            }
+        }
+        if (  nbPartsDecl == 2 ) {
+            if ( montantImpots < SEUIL_DECOTE_DECLARANT_COUPLE) {
+                decote =  DECOTE_MAX_DECLARANT_COUPLE - ( montantImpots * TAUX_DECOTE);
+            }
+        }
+
+        decote = Math.round( decote );
+
+        return decote;
+    }
+
 
     public long calculImpot( int revNet, SituationFamiliale sitFam, int nbEnfants, int nbEnfantsHandicapes, boolean parentIsol) {
         //TODO parentIso =/= parentIsol
@@ -192,21 +217,8 @@ public class Simulateur {
             montantImpots = montantImpDecl - plafond;
         }
 
-        decote = 0;
+        decote = getDecote(nbPartsDecl, montantImpots);
         // decote
-        if ( nbPartsDecl == 1 ) {
-            if ( montantImpots < SEUIL_DECOTE_DECLARANT_SEUL) {
-                 decote = DECOTE_MAX_DECLARANT_SEUL - ( montantImpots * TAUX_DECOTE);
-            }
-        }
-        if (  nbPartsDecl == 2 ) {
-            if ( montantImpots < SEUIL_DECOTE_DECLARANT_COUPLE) {
-                 decote =  DECOTE_MAX_DECLARANT_COUPLE - ( montantImpots * TAUX_DECOTE);
-            }
-        }
-
-        decote = Math.round( decote );
-
 
         montantImpots = Math.max(0, montantImpots - decote);
 
