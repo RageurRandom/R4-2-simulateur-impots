@@ -94,5 +94,14 @@ class ICalculateurImpotTest {
         simulateur.setParentIsole(false);
         simulateur.calculImpotSurRevenuNet();
         assertEquals(59009, simulateur.getImpotSurRevenuNet());
+
+
+        simulateur.setRevenusNet(4900);
+        simulateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+        simulateur.setNbEnfantsACharge(0);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(false);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(0, simulateur.getImpotSurRevenuNet());
     }
 }
