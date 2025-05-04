@@ -5,23 +5,86 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ICalculateurImpotTest {
+    void getAbattement(){
+        Simulateur simulateur = new Simulateur();
+        simulateur.calculImpot(4900, SituationFamiliale.CELIBATAIRE, 0, 0, false);
+
+    }
 
     @Test
     void getImpotSurRevenuNet() {
-        Simulateur simulateur = new Simulateur();
-        long impot = simulateur.calculImpot(65000, SituationFamiliale.MARIE, 3, 0, false);
-        assertEquals(685, impot);
-        impot = simulateur.calculImpot(65000, SituationFamiliale.MARIE, 3, 1, false);
-        assertEquals(0, impot);
-        impot = simulateur.calculImpot(35000, SituationFamiliale.DIVORCE, 1, 0, true);
-        assertEquals(550, impot);
-        impot = simulateur.calculImpot(35000, SituationFamiliale.DIVORCE, 2, 0, true);
-        assertEquals(0, impot);
-        impot = simulateur.calculImpot(50000, SituationFamiliale.DIVORCE, 3, 0, true);
-        assertEquals(1, impot);
-        impot = simulateur.calculImpot(50000, SituationFamiliale.DIVORCE, 3, 1, true);
-        assertEquals(0, impot);
-        impot = simulateur.calculImpot(200000, SituationFamiliale.CELIBATAIRE, 0, 0, true);
-        assertEquals(60768, impot);
+        ICalculateurImpot simulateur = new SimulateurImpotMock();
+
+        simulateur.setRevenusNet(65000);
+        simulateur.setSituationFamiliale(SituationFamiliale.MARIE);
+        simulateur.setNbEnfantsACharge(3);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(false);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(685, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(65000);
+        simulateur.setSituationFamiliale(SituationFamiliale.MARIE);
+        simulateur.setNbEnfantsACharge(3);
+        simulateur.setNbEnfantsSituationHandicap(1);
+        simulateur.setParentIsole(false);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(0, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(35000);
+        simulateur.setSituationFamiliale(SituationFamiliale.DIVORCE);
+        simulateur.setNbEnfantsACharge(1);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(true);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(550, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(35000);
+        simulateur.setSituationFamiliale(SituationFamiliale.DIVORCE);
+        simulateur.setNbEnfantsACharge(2);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(true);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(0, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(50000);
+        simulateur.setSituationFamiliale(SituationFamiliale.DIVORCE);
+        simulateur.setNbEnfantsACharge(3);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(true);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(1, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(50000);
+        simulateur.setSituationFamiliale(SituationFamiliale.DIVORCE);
+        simulateur.setNbEnfantsACharge(3);
+        simulateur.setNbEnfantsSituationHandicap(1);
+        simulateur.setParentIsole(true);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(0, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(200000);
+        simulateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+        simulateur.setNbEnfantsACharge(0);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(true);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(60768, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(200000);
+        simulateur.setSituationFamiliale(SituationFamiliale.VEUF);
+        simulateur.setNbEnfantsACharge(0);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(false);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(60768, simulateur.getImpotSurRevenuNet());
+
+        simulateur.setRevenusNet(200000);
+        simulateur.setSituationFamiliale(SituationFamiliale.VEUF);
+        simulateur.setNbEnfantsACharge(1);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(false);
+        simulateur.calculImpotSurRevenuNet();
+        assertEquals(59009, simulateur.getImpotSurRevenuNet());
     }
 }
