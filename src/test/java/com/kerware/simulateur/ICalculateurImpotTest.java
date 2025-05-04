@@ -5,9 +5,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ICalculateurImpotTest {
+    @Test
     void getAbattement(){
-        Simulateur simulateur = new Simulateur();
-        simulateur.calculImpot(4900, SituationFamiliale.CELIBATAIRE, 0, 0, false);
+        ICalculateurImpot simulateurMock = new SimulateurImpotMock();
+        simulateurMock.setRevenusNet(4900);
+        simulateurMock.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+        simulateurMock.setNbEnfantsACharge(0);
+        simulateurMock.setNbEnfantsSituationHandicap(0);
+        simulateurMock.setParentIsole(false);
+        simulateurMock.calculImpotSurRevenuNet();
+
+        assertEquals(simulateurMock.getAbattement(), 495);
 
     }
 
