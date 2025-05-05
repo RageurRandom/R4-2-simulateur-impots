@@ -68,3 +68,12 @@ graph LR
   F --> G[Impôt Final]
 ```
 
+## ✅ Tests Unitaires
+
+### 🔍 Couverture des Tests
+Objectif **90%+ de couverture de code** avec :
+- **Jacoco** pour le rapport de couverture
+- **JUnit 5** pour l'exécution des tests
+
+
+
