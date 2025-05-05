@@ -1,5 +1,9 @@
 package com.kerware.simulateur;
 
+/**
+ * Enumération représentant les différentes situations familiales possibles
+ * pour un contribuable, avec le nombre de parts fiscales correspondant.
+ */
 public enum SituationFamiliale {
     CELIBATAIRE(1),
     PACSE(2),
@@ -9,9 +13,7 @@ public enum SituationFamiliale {
 
     public final int nbParts;
 
-    private SituationFamiliale(int nbParts){
+    SituationFamiliale(int nbParts) {
         this.nbParts = nbParts;
     }
-
-
 }
