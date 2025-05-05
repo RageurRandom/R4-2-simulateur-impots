@@ -1,11 +1,40 @@
 package com.kerware.simulateur;
 
+import com.kerware.simulateur.exceptions.CalculImpotException;
 import com.kerware.simulateur.model.SituationFamiliale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ICalculateurImpotTest {
+    @Test
+    void testExceptions(){
+        ICalculateurImpot simulateurMock = new CalculateurImpot();
+        simulateurMock.setRevenusNet(4900);
+        simulateurMock.setNbEnfantsACharge(0);
+        simulateurMock.setNbEnfantsSituationHandicap(0);
+        simulateurMock.setParentIsole(false);
+        assertThrows(CalculImpotException.class,()->{
+            simulateurMock.calculImpotSurRevenuNet();
+        });
+
+        assertThrows(CalculImpotException.class, ()->{
+            simulateurMock.setSituationFamiliale(null);
+        });
+
+        assertThrows(CalculImpotException.class, ()->{
+            simulateurMock.setRevenusNet(-1);
+        });
+
+        assertThrows(CalculImpotException.class, ()->{
+            simulateurMock.setNbEnfantsACharge(-1);
+        });
+
+        assertThrows(CalculImpotException.class, ()->{
+            simulateurMock.setNbEnfantsSituationHandicap(-1);
+        });
+    }
+
     @Test
     void getAbattement(){
         ICalculateurImpot simulateurMock = new CalculateurImpot();
@@ -19,6 +48,71 @@ class ICalculateurImpotTest {
         assertEquals(simulateurMock.getAbattement(), 495);
 
     }
+
+    @Test
+    void testSetRevenusNet() {
+        ICalculateurImpot simulateur = new CalculateurImpot();
+        simulateur.setRevenusNet(5000);
+        assertEquals(5000, ((CalculateurImpot) simulateur).getRevenusNet());
+
+        // Test for negative value
+        assertThrows(CalculImpotException.class, () -> simulateur.setRevenusNet(-1000));
+    }
+
+    @Test
+    void testSetSituationFamiliale() {
+        ICalculateurImpot simulateur = new CalculateurImpot();
+        simulateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+        assertEquals(SituationFamiliale.CELIBATAIRE, ((CalculateurImpot) simulateur).getSituationFamiliale());
+
+        // Test for null value
+        assertThrows(CalculImpotException.class, () -> simulateur.setSituationFamiliale(null));
+    }
+
+    @Test
+    void testSetNbEnfantsACharge() {
+        ICalculateurImpot simulateur = new CalculateurImpot();
+        simulateur.setNbEnfantsACharge(2);
+        assertEquals(2, ((CalculateurImpot) simulateur).getNbEnfants());
+
+        // Test for negative value
+        assertThrows(CalculImpotException.class, () -> simulateur.setNbEnfantsACharge(-1));
+    }
+
+    @Test
+    void testSetNbEnfantsSituationHandicap() {
+        ICalculateurImpot simulateur = new CalculateurImpot();
+        simulateur.setNbEnfantsSituationHandicap(1);
+        assertEquals(1, ((CalculateurImpot) simulateur).getNbEnfantsHandicapes());
+
+        // Test for negative value
+        assertThrows(CalculImpotException.class, () -> simulateur.setNbEnfantsSituationHandicap(-1));
+    }
+
+    @Test
+    void testSetParentIsole() {
+        ICalculateurImpot simulateur = new CalculateurImpot();
+        simulateur.setParentIsole(true);
+        assertEquals(true, ((CalculateurImpot) simulateur).isParentIsole());
+
+        simulateur.setParentIsole(false);
+        assertEquals(false, ((CalculateurImpot) simulateur).isParentIsole());
+    }
+
+    @Test
+    void testGetRevenuFiscalReference() {
+        ICalculateurImpot simulateur = new CalculateurImpot();
+        simulateur.setRevenusNet(5000);
+        simulateur.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
+        simulateur.setNbEnfantsACharge(0);
+        simulateur.setNbEnfantsSituationHandicap(0);
+        simulateur.setParentIsole(false);
+        simulateur.calculImpotSurRevenuNet();
+
+        assertEquals(5000 - simulateur.getAbattement(), simulateur.getRevenuFiscalReference()); // Example value
+    }
+
+
 
     @Test
     void getImpotSurRevenuNet() {
