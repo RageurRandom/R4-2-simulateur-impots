@@ -65,7 +65,6 @@
         <module name="MethodName"/>
         <module name="ConstantName"/>
 
-        <module name="HiddenField"/>
         <module name="MagicNumber"/>
 
         <module name="DesignForExtension"/>

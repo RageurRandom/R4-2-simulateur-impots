@@ -11,7 +11,11 @@ public enum SituationFamiliale {
     DIVORCE(1),
     VEUF(1);
 
-    public final int nbParts;
+    private final int nbParts;
+
+    public int getNbParts() {
+        return nbParts;
+    }
 
     SituationFamiliale(int nbParts) {
         this.nbParts = nbParts;

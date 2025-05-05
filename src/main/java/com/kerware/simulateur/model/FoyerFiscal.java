@@ -1,6 +1,6 @@
 package com.kerware.simulateur.model;
 
-public class FoyerFiscal {
+public final class FoyerFiscal {
     private final int revenusNet;
     private final SituationFamiliale situation;
     private final int nbEnfants;
