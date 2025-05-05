@@ -1,20 +1,21 @@
 package com.kerware.simulateur;
 
+/**
+ * Interface définissant le contrat pour un calculateur d'impôt sur le revenu.
+ */
 public interface ICalculateurImpot {
+    void setRevenusNet(int rn);
+    void setSituationFamiliale(SituationFamiliale sf);
+    void setNbEnfantsACharge(int nbe);
+    void setNbEnfantsSituationHandicap(int nbesh);
+    void setParentIsole(boolean pi);
 
-    public void setRevenusNet( int rn );
-    public void setSituationFamiliale( SituationFamiliale sf );
-    public void setNbEnfantsACharge( int nbe );
-    public void setNbEnfantsSituationHandicap( int nbesh );
-    public void setParentIsole( boolean pi );
+    void calculImpotSurRevenuNet();
 
-    public void calculImpotSurRevenuNet();
-
-    public int getRevenuFiscalReference();
-    public int getAbattement();
-    public int getNbPartsFoyerFiscal();
-    public int getImpotAvantDecote();
-    public int getDecote();
-    public int getImpotSurRevenuNet();
-
+    int getRevenuFiscalReference();
+    int getAbattement();
+    int getNbPartsFoyerFiscal();
+    int getImpotAvantDecote();
+    int getDecote();
+    int getImpotSurRevenuNet();
 }
