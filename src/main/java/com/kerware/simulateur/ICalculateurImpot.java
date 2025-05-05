@@ -1,5 +1,7 @@
 package com.kerware.simulateur;
 
+import com.kerware.simulateur.model.SituationFamiliale;
+
 /**
  * Interface définissant le contrat pour un calculateur d'impôt sur le revenu.
  */
