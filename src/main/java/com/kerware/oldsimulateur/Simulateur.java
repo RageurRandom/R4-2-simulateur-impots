@@ -119,7 +119,7 @@ public class Simulateur {
 
         // parts déclarants
 
-        nbPartsDecl = sitFam.nbParts;
+        nbPartsDecl = sitFam.getNbParts();
 
         //on garde la part du conjoint décédé si on a des enfants à charge
         if(sitFam == SituationFamiliale.VEUF && nbEnf > 0){

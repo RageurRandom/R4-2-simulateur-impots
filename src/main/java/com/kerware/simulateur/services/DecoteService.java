@@ -7,6 +7,12 @@ public class DecoteService {
     private static final double MAX_COUPLE = 1444;
     private static final double TAUX = 0.4525;
 
+    /**
+     * Calcule la décote
+     * @param nbPartsDeclarants
+     * @param impotAvantDecote
+     * @return decote : int décote possible pour ces paramètres
+     */
     public int calculer(int nbPartsDeclarants, double impotAvantDecote) {
         if (nbPartsDeclarants == 1 && impotAvantDecote < SEUIL_CELIBATAIRE) {
             return (int) Math.round(MAX_CELIBATAIRE - (impotAvantDecote * TAUX));

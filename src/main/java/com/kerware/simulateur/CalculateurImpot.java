@@ -1,10 +1,14 @@
 package com.kerware.simulateur;
 
 import com.kerware.simulateur.model.SituationFamiliale;
-import com.kerware.simulateur.services.*;
+import com.kerware.simulateur.services.AbattementService;
+import com.kerware.simulateur.services.DecoteService;
+import com.kerware.simulateur.services.PartsFiscalesService;
+import com.kerware.simulateur.services.PlafonnementService;
+import com.kerware.simulateur.services.TrancheImpotService;
 import com.kerware.simulateur.exceptions.CalculImpotException;
 
-public class CalculateurImpot implements ICalculateurImpot {
+public final class CalculateurImpot implements ICalculateurImpot {
     // Services
     private final AbattementService abattementService = new AbattementService();
     private final PartsFiscalesService partsService = new PartsFiscalesService();
@@ -29,25 +33,35 @@ public class CalculateurImpot implements ICalculateurImpot {
 
     @Override
     public void setRevenusNet(int rn) {
-        if (rn < 0) throw new CalculImpotException("Le revenu net ne peut pas être négatif");
+        if (rn < 0) {
+            throw new CalculImpotException("Le revenu net ne peut pas être négatif");
+        }
         this.revenusNet = rn;
     }
 
     @Override
     public void setSituationFamiliale(SituationFamiliale sf) {
-        if (sf == null) throw new CalculImpotException("La situation familiale ne peut pas être nulle");
+        if (sf == null) {
+            throw new CalculImpotException("La situation familiale ne peut pas être nulle");
+        }
         this.situationFamiliale = sf;
     }
 
     @Override
     public void setNbEnfantsACharge(int nbe) {
-        if (nbe < 0) throw new CalculImpotException("Le nombre d'enfants ne peut pas être négatif");
+        if (nbe < 0) {
+            throw new CalculImpotException("Le nombre d'enfants ne peut pas être négatif");
+        }
         this.nbEnfants = nbe;
     }
 
     @Override
     public void setNbEnfantsSituationHandicap(int nbesh) {
-        if (nbesh < 0) throw new CalculImpotException("Le nombre d'enfants handicapés ne peut pas être négatif");
+        if (nbesh < 0) {
+            throw new CalculImpotException(
+                    "Le nombre d'enfants handicapés ne peut pas être négatif"
+            );
+        }
         this.nbEnfantsHandicapes = nbesh;
     }
 
@@ -60,7 +74,9 @@ public class CalculateurImpot implements ICalculateurImpot {
     public void calculImpotSurRevenuNet() {
         // Validation implicite via les setters
         if (situationFamiliale == null) {
-            throw new CalculImpotException("La situation familiale doit être définie avant le calcul");
+            throw new CalculImpotException(
+                    "La situation familiale doit être définie avant le calcul"
+            );
         }
 
         // 1. Calcul abattement et RFR
@@ -80,21 +96,23 @@ public class CalculateurImpot implements ICalculateurImpot {
         double impotFoyer = trancheService.calculer(quotientFamilial) * nbParts;
 
         // 4. Plafonnement QF
-        double quotientDeclarants = revenuFiscalReference / situationFamiliale.nbParts;
-        double impotDeclarants = trancheService.calculer(quotientDeclarants) * situationFamiliale.nbParts;
+        double quotientDeclarants = (double) revenuFiscalReference /
+                situationFamiliale.getNbParts();
+        double impotDeclarants = trancheService.calculer(quotientDeclarants)
+                * situationFamiliale.getNbParts();
 
         this.impotAvantDecote = (int) Math.round(
                 plafonnementService.appliquer(
                         impotDeclarants,
                         impotFoyer,
                         nbParts,
-                        situationFamiliale.nbParts
+                        situationFamiliale.getNbParts()
                 )
         );
 
         // 5. Calcul décote
         this.decote = decoteService.calculer(
-                situationFamiliale.nbParts,
+                situationFamiliale.getNbParts(),
                 impotAvantDecote
         );
 
