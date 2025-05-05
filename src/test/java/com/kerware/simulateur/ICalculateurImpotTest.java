@@ -1,5 +1,6 @@
 package com.kerware.simulateur;
 
+import com.kerware.simulateur.model.SituationFamiliale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ICalculateurImpotTest {
     @Test
     void getAbattement(){
-        ICalculateurImpot simulateurMock = new SimulateurImpotMock();
+        ICalculateurImpot simulateurMock = new CalculateurImpot();
         simulateurMock.setRevenusNet(4900);
         simulateurMock.setSituationFamiliale(SituationFamiliale.CELIBATAIRE);
         simulateurMock.setNbEnfantsACharge(0);
@@ -21,7 +22,7 @@ class ICalculateurImpotTest {
 
     @Test
     void getImpotSurRevenuNet() {
-        ICalculateurImpot simulateur = new SimulateurImpotMock();
+        ICalculateurImpot simulateur = new CalculateurImpot();
 
         simulateur.setRevenusNet(65000);
         simulateur.setSituationFamiliale(SituationFamiliale.MARIE);
