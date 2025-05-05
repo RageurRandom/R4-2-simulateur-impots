@@ -1,4 +1,4 @@
-package com.kerware.simulateur;
+package com.kerware.simulateur.model;
 
 /**
  * Enumération représentant les différentes situations familiales possibles

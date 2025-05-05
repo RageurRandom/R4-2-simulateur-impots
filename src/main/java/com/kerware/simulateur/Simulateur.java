@@ -1,5 +1,7 @@
 package com.kerware.simulateur;
 
+import com.kerware.simulateur.model.SituationFamiliale;
+
 /**
  * Classe principale pour tester le calculateur d'impôt avec les mêmes cas
  * que l'ancien simulateur.
